@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Niek & Iris — Trouwdag Weerbericht</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf8f5;
+      --cream-dark: #f2ece4;
+      --rose: #c9a0a0;
+      --rose-light: #eddada;
+      --rose-deep: #b08080;
+      --sage: #8fa888;
+      --sage-light: #dce8da;
+      --gold: #c9a96e;
+      --gold-light: #f0e4cc;
+      --text: #4a3f3a;
+      --text-light: #7a6e68;
+      --white: #ffffff;
+      --shadow: 0 4px 24px rgba(74,63,58,0.08);
+      --shadow-hover: 0 8px 32px rgba(74,63,58,0.14);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background-color: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Subtle watercolor-style background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 15%, rgba(201,160,160,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 70% at 90% 80%, rgba(143,168,136,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 50% 50%, rgba(201,169,110,0.06) 0%, transparent 60%),
+        linear-gradient(160deg, #faf8f5 0%, #f5ede4 50%, #f0ebe3 100%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    /* ── SVG Floral Corner Decorations ── */
+    .corner-flower {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.55;
+    }
+    .corner-flower.tl { top: -10px; left: -10px; transform: rotate(0deg); }
+    .corner-flower.tr { top: -10px; right: -10px; transform: rotate(90deg); }
+    .corner-flower.bl { bottom: -10px; left: -10px; transform: rotate(270deg); }
+    .corner-flower.br { bottom: -10px; right: -10px; transform: rotate(180deg); }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      padding: 64px 20px 48px;
+      position: relative;
+    }
+
+    .header-flowers {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      animation: floatIn 1s ease both;
+    }
+
+    .header-flowers svg { opacity: 0.7; }
+
+    .title-names {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      animation: fadeUp 0.9s ease 0.1s both;
+      position: relative;
+    }
+
+    .title-names .ampersand {
+      color: var(--rose);
+      font-style: italic;
+      display: inline-block;
+    }
+
+    .title-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(1rem, 3vw, 1.3rem);
+      color: var(--text-light);
+      margin-top: 12px;
+      letter-spacing: 0.04em;
+      animation: fadeUp 0.9s ease 0.2s both;
+    }
+
+    .divider-line {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+      margin: 20px auto;
+      max-width: 320px;
+      animation: fadeUp 0.9s ease 0.3s both;
+    }
+    .divider-line::before,
+    .divider-line::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--rose));
+    }
+    .divider-line::after {
+      background: linear-gradient(to left, transparent, var(--rose));
+    }
+    .divider-diamond {
+      width: 6px; height: 6px;
+      background: var(--rose);
+      transform: rotate(45deg);
+      border-radius: 1px;
+    }
+
+    .location-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--white);
+      border: 1px solid var(--rose-light);
+      border-radius: 32px;
+      padding: 7px 18px;
+      font-size: 0.88rem;
+      color: var(--text-light);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.9s ease 0.35s both;
+    }
+    .location-badge svg { color: var(--rose); flex-shrink: 0; }
+
+    .countdown-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--rose-light), var(--gold-light));
+      border: 1px solid rgba(201,160,160,0.3);
+      border-radius: 32px;
+      padding: 10px 24px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--text);
+      margin-top: 16px;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.9s ease 0.45s both;
+    }
+    .countdown-badge .days-num {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--rose-deep);
+    }
+
+    /* ── Refresh Button ── */
+    .refresh-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 8px 0 32px;
+      animation: fadeUp 0.9s ease 0.55s both;
+    }
+
+    .last-update {
+      font-size: 0.8rem;
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    .btn-refresh {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--white);
+      border: 1.5px solid var(--rose);
+      border-radius: 32px;
+      padding: 9px 20px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--rose-deep);
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: var(--shadow);
+    }
+    .btn-refresh:hover {
+      background: var(--rose-light);
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+    .btn-refresh svg {
+      transition: transform 0.5s ease;
+    }
+    .btn-refresh.spinning svg {
+      animation: spin 0.6s linear infinite;
+    }
+
+    /* ── Loading State ── */
+    .loading-wrap {
+      text-align: center;
+      padding: 80px 20px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .loading-petals {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .loading-petals span {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border-radius: 50% 0 50% 0;
+      background: var(--rose);
+      animation: petalBounce 1.2s ease-in-out infinite;
+    }
+    .loading-petals span:nth-child(2) { animation-delay: 0.15s; background: var(--gold); }
+    .loading-petals span:nth-child(3) { animation-delay: 0.3s; background: var(--sage); }
+    .loading-petals span:nth-child(4) { animation-delay: 0.45s; background: var(--rose); }
+    .loading-petals span:nth-child(5) { animation-delay: 0.6s; background: var(--gold); }
+    .loading-text {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--text-light);
+      font-size: 1.1rem;
+    }
+
+    /* ── Error State ── */
+    .error-card {
+      background: var(--white);
+      border: 1px solid var(--rose-light);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .error-card .error-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .error-card h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .error-card p { color: var(--text-light); font-size: 0.9rem; }
+
+    /* ── Too-far-away notice ── */
+    .notice-card {
+      background: linear-gradient(135deg, #fff8f0, #fff3f3);
+      border: 1px solid var(--gold-light);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .notice-card .notice-icon { font-size: 3rem; margin-bottom: 16px; }
+    .notice-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .notice-card p { color: var(--text-light); line-height: 1.7; }
+
+    /* ── Day Summary ── */
+    .day-summary {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(201,160,160,0.15);
+      animation: fadeUp 0.7s ease both;
+    }
+    .day-summary h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .day-summary h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--rose-light), transparent);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 16px;
+    }
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 16px 12px;
+      background: var(--cream);
+      border-radius: 14px;
+      text-align: center;
+      border: 1px solid var(--cream-dark);
+    }
+    .summary-item .s-icon { font-size: 1.5rem; }
+    .summary-item .s-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      font-weight: 700;
+    }
+    .summary-item .s-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* ── Hourly Section ── */
+    .hourly-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hourly-section h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--rose-light), transparent);
+    }
+
+    .hourly-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hour-card {
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid rgba(201,160,160,0.12);
+      box-shadow: var(--shadow);
+      padding: 16px 22px;
+      display: grid;
+      grid-template-columns: 56px 44px 1fr 1fr 1fr 1fr;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      animation: slideIn 0.5s ease both;
+    }
+    .hour-card:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .hour-time {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .hour-icon { font-size: 1.6rem; text-align: center; }
+
+    .hour-temp {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hour-temp .main-temp {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .hour-temp .feels-like {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .hour-rain {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .rain-prob {
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .rain-prob.low { color: var(--sage); }
+    .rain-prob.medium { color: #d4885a; }
+    .rain-prob.high { color: var(--rose-deep); }
+    .rain-amount {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .hour-cloud {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hour-cloud .label {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .hour-cloud .value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hour-wind {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .hour-wind .label {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .hour-wind .value {
+      font-size: 0.9rem;
+      color: var(--text);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .wind-arrow {
+      display: inline-block;
+      font-size: 1rem;
+    }
+
+    /* Sun minutes shown as small tag on card if > 0 */
+    .hour-card.has-sun {
+      border-left: 3px solid var(--gold);
+    }
+    .sun-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--gold-light);
+      border-radius: 8px;
+      padding: 2px 7px;
+      font-size: 0.7rem;
+      color: #7a5f20;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 640px) {
+      .hour-card {
+        grid-template-columns: 48px 36px 1fr 1fr;
+        padding: 14px 16px;
+      }
+      .hour-cloud { display: none; }
+      .hour-wind { display: none; }
+    }
+    @media (max-width: 400px) {
+      .hour-card {
+        grid-template-columns: 42px 32px 1fr 1fr;
+        gap: 8px;
+        padding: 12px 14px;
+      }
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 48px 20px 20px;
+      color: var(--text-light);
+      font-size: 0.82rem;
+      line-height: 1.8;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    footer a { color: var(--rose); text-decoration: none; }
+    footer .heart { color: var(--rose); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.9); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes petalBounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+      50% { transform: translateY(-14px) rotate(45deg); opacity: 1; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Corner flowers -->
+<svg class="corner-flower tl" width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="30" rx="22" ry="40" fill="#f0d4d4" transform="rotate(10 60 30)"/>
+  <ellipse cx="30" cy="60" rx="22" ry="40" fill="#ecdada" transform="rotate(80 30 60)"/>
+  <ellipse cx="90" cy="65" rx="22" ry="40" fill="#f5e0e0" transform="rotate(-35 90 65)"/>
+  <ellipse cx="40" cy="95" rx="22" ry="40" fill="#eddbd8" transform="rotate(50 40 95)"/>
+  <ellipse cx="70" cy="90" rx="22" ry="40" fill="#f0d8d4" transform="rotate(-70 70 90)"/>
+  <circle cx="60" cy="68" r="14" fill="#f9f0e8"/>
+  <ellipse cx="130" cy="10" rx="14" ry="26" fill="#dce8da" transform="rotate(20 130 10)" opacity="0.7"/>
+  <ellipse cx="155" cy="30" rx="14" ry="26" fill="#cfe0cd" transform="rotate(70 155 30)" opacity="0.7"/>
+  <circle cx="142" cy="22" r="9" fill="#f0f5ef" opacity="0.7"/>
+</svg>
+
+<svg class="corner-flower tr" width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="30" rx="22" ry="40" fill="#f0d4d4" transform="rotate(10 60 30)"/>
+  <ellipse cx="30" cy="60" rx="22" ry="40" fill="#ecdada" transform="rotate(80 30 60)"/>
+  <ellipse cx="90" cy="65" rx="22" ry="40" fill="#f5e0e0" transform="rotate(-35 90 65)"/>
+  <ellipse cx="40" cy="95" rx="22" ry="40" fill="#eddbd8" transform="rotate(50 40 95)"/>
+  <ellipse cx="70" cy="90" rx="22" ry="40" fill="#f0d8d4" transform="rotate(-70 70 90)"/>
+  <circle cx="60" cy="68" r="14" fill="#f9f0e8"/>
+</svg>
+
+<svg class="corner-flower bl" width="160" height="160" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="100" cy="60" rx="16" ry="30" fill="#dce8da" transform="rotate(5 100 60)" opacity="0.8"/>
+  <ellipse cx="75" cy="78" rx="16" ry="30" fill="#cfe0cd" transform="rotate(75 75 78)" opacity="0.8"/>
+  <ellipse cx="125" cy="78" rx="16" ry="30" fill="#d4e8d2" transform="rotate(-65 125 78)" opacity="0.8"/>
+  <circle cx="100" cy="85" r="10" fill="#f0f5ef" opacity="0.8"/>
+</svg>
+
+<svg class="corner-flower br" width="160" height="160" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <ellipse cx="60" cy="30" rx="22" ry="40" fill="#f0d4d4" transform="rotate(10 60 30)" opacity="0.6"/>
+  <ellipse cx="30" cy="60" rx="22" ry="40" fill="#ecdada" transform="rotate(80 30 60)" opacity="0.6"/>
+  <ellipse cx="90" cy="65" rx="22" ry="40" fill="#f5e0e0" transform="rotate(-35 90 65)" opacity="0.6"/>
+  <ellipse cx="40" cy="95" rx="22" ry="40" fill="#eddbd8" transform="rotate(50 40 95)" opacity="0.6"/>
+  <circle cx="60" cy="68" r="14" fill="#f9f0e8" opacity="0.6"/>
+</svg>
+
+<div class="page-wrap">
+
+  <!-- Header -->
+  <header>
+    <div class="header-flowers">
+      <!-- Frangipani SVG flower -->
+      <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="27" cy="12" rx="9" ry="16" fill="#f5d5d5"/>
+        <ellipse cx="27" cy="12" rx="9" ry="16" fill="url(#p1)"/>
+        <ellipse cx="42" cy="20" rx="9" ry="16" fill="#f0d8cc" transform="rotate(72 42 20)"/>
+        <ellipse cx="36" cy="40" rx="9" ry="16" fill="#f5d5d5" transform="rotate(144 36 40)"/>
+        <ellipse cx="18" cy="40" rx="9" ry="16" fill="#f0d8cc" transform="rotate(216 18 40)"/>
+        <ellipse cx="12" cy="20" rx="9" ry="16" fill="#f5d5d5" transform="rotate(288 12 20)"/>
+        <circle cx="27" cy="27" r="7" fill="#f9ecd0"/>
+        <defs>
+          <radialGradient id="p1" cx="50%" cy="80%" r="60%">
+            <stop offset="0%" stop-color="#f9d6d6"/>
+            <stop offset="100%" stop-color="#e8b8b8"/>
+          </radialGradient>
+        </defs>
+      </svg>
+      <!-- Small leaf -->
+      <svg width="32" height="54" viewBox="0 0 32 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 50 C16 50 0 30 8 15 C12 8 20 4 16 2 C20 4 24 10 22 18 C26 10 28 4 24 2 C30 8 32 20 16 50Z" fill="#b5ceb0" opacity="0.7"/>
+      </svg>
+      <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="27" cy="12" rx="9" ry="16" fill="#e8d5f0"/>
+        <ellipse cx="42" cy="20" rx="9" ry="16" fill="#ead8f0" transform="rotate(72 42 20)"/>
+        <ellipse cx="36" cy="40" rx="9" ry="16" fill="#f0d8ee" transform="rotate(144 36 40)"/>
+        <ellipse cx="18" cy="40" rx="9" ry="16" fill="#e8d8f0" transform="rotate(216 18 40)"/>
+        <ellipse cx="12" cy="20" rx="9" ry="16" fill="#ead5ee" transform="rotate(288 12 20)"/>
+        <circle cx="27" cy="27" r="7" fill="#f9ecd0"/>
+      </svg>
+    </div>
+
+    <h1 class="title-names">Niek <span class="ampersand">&amp;</span> Iris</h1>
+    <p class="title-sub">Trouwdag Weerbericht &mdash; 6 juni 2026</p>
+
+    <div class="divider-line"><div class="divider-diamond"></div></div>
+
+    <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+      <div class="location-badge">
+        <svg width="13" height="15" viewBox="0 0 13 15" fill="none">
+          <path d="M6.5 0C4.015 0 2 2.015 2 4.5c0 3.375 4.5 9 4.5 9S11 7.875 11 4.5C11 2.015 8.985 0 6.5 0Zm0 6.125a1.625 1.625 0 1 1 0-3.25 1.625 1.625 0 0 1 0 3.25Z" fill="currentColor"/>
+        </svg>
+        Netl, Kraggenburg
+      </div>
+      <div class="countdown-badge" id="countdown-badge">
+        <span>🌸</span>
+        <span id="countdown-text">Berekenen...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Refresh bar -->
+  <div class="refresh-bar">
+    <span class="last-update" id="last-update">Ophalen van weerdata…</span>
+    <button class="btn-refresh" id="btn-refresh" onclick="loadWeather(true)">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12.5 2.5A6 6 0 1 0 13 8"/>
+        <path d="M10 2.5h2.5V0"/>
+      </svg>
+      Vernieuwen
+    </button>
+  </div>
+
+  <!-- Content area -->
+  <div id="content"></div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Weerdata via <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> &mdash; vrij beschikbaar, geen API-sleutel vereist</p>
+    <p style="margin-top:6px;">Gemaakt met <span class="heart">♥</span> voor Niek &amp; Iris &mdash; 6 juni 2026 &mdash; Netl, Kraggenburg</p>
+  </footer>
+
+</div>
+
+<script>
+  const WEDDING_DATE = new Date('2026-06-06T00:00:00');
+  const API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=52.659&longitude=5.762&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,sunshine_duration,uv_index&daily=sunrise,sunset&timezone=Europe%2FAmsterdam&start_date=2026-06-06&end_date=2026-06-06';
+
+  const WMO_EMOJI = {
+    0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+    45:'🌫️', 48:'🌫️',
+    51:'🌦️', 53:'🌦️', 55:'🌧️',
+    56:'🌧️', 57:'🌧️',
+    61:'🌦️', 63:'🌧️', 65:'🌧️',
+    66:'🌧️', 67:'🌧️',
+    71:'🌨️', 73:'🌨️', 75:'❄️', 77:'🌨️',
+    80:'🌦️', 81:'🌧️', 82:'⛈️',
+    85:'🌨️', 86:'🌨️',
+    95:'⛈️', 96:'⛈️', 99:'⛈️'
+  };
+  const WMO_LABEL = {
+    0:'Heldere hemel', 1:'Overwegend helder', 2:'Gedeeltelijk bewolkt', 3:'Bewolkt',
+    45:'Mist', 48:'Rijpmist',
+    51:'Lichte motregen', 53:'Motregen', 55:'Dichte motregen',
+    61:'Lichte regen', 63:'Matige regen', 65:'Zware regen',
+    71:'Lichte sneeuw', 73:'Sneeuw', 75:'Zware sneeuw',
+    80:'Lichte buien', 81:'Regenbuien', 82:'Zware buien',
+    95:'Onweer', 96:'Onweer met hagel', 99:'Zwaar onweer met hagel'
+  };
+
+  function wmoEmoji(code) { return WMO_EMOJI[code] || '🌡️'; }
+  function wmoLabel(code) { return WMO_LABEL[code] || 'Onbekend'; }
+
+  function windDirection(deg) {
+    const dirs = ['N','NO','O','ZO','Z','ZW','W','NW'];
+    return dirs[Math.round(deg / 45) % 8];
+  }
+  function windArrow(deg) {
+    // CSS rotation: arrow points in wind direction
+    return `<span class="wind-arrow" style="display:inline-block;transform:rotate(${deg}deg)">↑</span>`;
+  }
+
+  function rainClass(prob) {
+    if (prob <= 20) return 'low';
+    if (prob <= 50) return 'medium';
+    return 'high';
+  }
+
+  function formatTime(isoString) {
+    return isoString.slice(11, 16);
+  }
+
+  function updateCountdown() {
+    const now = new Date();
+    const msLeft = WEDDING_DATE - now;
+    const el = document.getElementById('countdown-text');
+    if (msLeft <= 0) {
+      el.textContent = '🎉 Vandaag is de grote dag!';
+      return;
+    }
+    const days = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+    if (days === 1) {
+      el.textContent = 'Morgen is het zover!';
+    } else {
+      el.innerHTML = `Nog <span class="days-num">${days}</span> dagen tot de bruiloft!`;
+    }
+  }
+
+  function renderLoading() {
+    document.getElementById('content').innerHTML = `
+      <div class="loading-wrap">
+        <div class="loading-petals">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="loading-text">Weerdata ophalen voor jullie grote dag&hellip;</p>
+      </div>`;
+  }
+
+  function renderError(msg) {
+    document.getElementById('content').innerHTML = `
+      <div class="error-card">
+        <div class="error-icon">🌧️</div>
+        <h3>Helaas, er ging iets mis</h3>
+        <p>${msg}</p>
+        <p style="margin-top:12px;">Probeer het over een moment opnieuw.</p>
+      </div>`;
+  }
+
+  function renderNotYetAvailable(daysAway) {
+    document.getElementById('content').innerHTML = `
+      <div class="notice-card">
+        <div class="notice-icon">🌸</div>
+        <h3>Verwachting nog niet beschikbaar</h3>
+        <p>
+          Het is nog <strong>${daysAway} dagen</strong> tot 6 juni 2026.<br/>
+          Weersverwachtingen zijn betrouwbaar tot circa 14&nbsp;dagen van tevoren.<br/><br/>
+          Kom later terug — hoe dichter bij de bruiloft, hoe nauwkeuriger de verwachting!
+        </p>
+      </div>`;
+  }
+
+  function renderWeather(data) {
+    const hourly = data.hourly;
+    const daily  = data.daily;
+
+    // Filter hours 06:00–23:00 (indices 6–23)
+    const startIdx = 6, endIdx = 23;
+    const hours = [];
+    for (let i = startIdx; i <= endIdx; i++) {
+      hours.push({
+        time:       formatTime(hourly.time[i]),
+        temp:       Math.round(hourly.temperature_2m[i]),
+        feels:      Math.round(hourly.apparent_temperature[i]),
+        rainProb:   hourly.precipitation_probability[i],
+        rain:       hourly.precipitation[i],
+        code:       hourly.weather_code[i],
+        cloud:      hourly.cloud_cover[i],
+        wind:       Math.round(hourly.wind_speed_10m[i]),
+        windDir:    hourly.wind_direction_10m[i],
+        sun:        Math.round(hourly.sunshine_duration[i] / 60), // seconds → minutes
+      });
+    }
+
+    // Day summary stats
+    const allTemps = hourly.temperature_2m.slice(startIdx, endIdx + 1);
+    const maxTemp  = Math.round(Math.max(...allTemps));
+    const minTemp  = Math.round(Math.min(...allTemps));
+    const totalRain = hourly.precipitation.reduce((a, b) => a + b, 0).toFixed(1);
+    const maxRainProb = Math.max(...hourly.precipitation_probability);
+    const sunrise  = formatTime(daily.sunrise[0]);
+    const sunset   = formatTime(daily.sunset[0]);
+
+    const summaryHTML = `
+      <div class="day-summary">
+        <h2>🌸 Dagoverzicht</h2>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="s-icon">🌅</span>
+            <span class="s-label">Zonsopgang</span>
+            <span class="s-value">${sunrise}</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-icon">🌇</span>
+            <span class="s-label">Zonsondergang</span>
+            <span class="s-value">${sunset}</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-icon">🌡️</span>
+            <span class="s-label">Max. temp.</span>
+            <span class="s-value">${maxTemp}°C</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-icon">🌡️</span>
+            <span class="s-label">Min. temp.</span>
+            <span class="s-value">${minTemp}°C</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-icon">💧</span>
+            <span class="s-label">Totale neerslag</span>
+            <span class="s-value">${totalRain} mm</span>
+          </div>
+          <div class="summary-item">
+            <span class="s-icon">☔</span>
+            <span class="s-label">Max. regenkans</span>
+            <span class="s-value" style="color:${maxRainProb>50?'var(--rose-deep)':maxRainProb>20?'#d4885a':'var(--sage)'}">${maxRainProb}%</span>
+          </div>
+        </div>
+      </div>`;
+
+    const hourCards = hours.map((h, idx) => {
+      const sunTag = h.sun > 0
+        ? `<span class="sun-tag">☀️ ${h.sun} min zon</span>`
+        : '';
+      const rainAmtStr = h.rain > 0
+        ? `<span class="rain-amount">💧 ${h.rain.toFixed(1)} mm</span>`
+        : '';
+      const hasSun = h.sun > 0 ? 'has-sun' : '';
+
+      return `
+        <div class="hour-card ${hasSun}" style="animation-delay:${idx * 0.04}s">
+          <div class="hour-time">${h.time}</div>
+          <div class="hour-icon" title="${wmoLabel(h.code)}">${wmoEmoji(h.code)}</div>
+          <div class="hour-temp">
+            <span class="main-temp">${h.temp}°C</span>
+            <span class="feels-like">Voelt als ${h.feels}°C</span>
+            ${sunTag}
+          </div>
+          <div class="hour-rain">
+            <span class="rain-prob ${rainClass(h.rainProb)}">💧 ${h.rainProb}%</span>
+            ${rainAmtStr}
+          </div>
+          <div class="hour-cloud">
+            <span class="label">Bewolking</span>
+            <span class="value">${h.cloud}%</span>
+          </div>
+          <div class="hour-wind">
+            <span class="label">Wind</span>
+            <span class="value">${windArrow(h.windDir)} ${h.wind} km/u ${windDirection(h.windDir)}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('content').innerHTML = summaryHTML + `
+      <div class="hourly-section">
+        <h2>⏱ Uur voor uur</h2>
+        <div class="hourly-grid">${hourCards}</div>
+      </div>`;
+  }
+
+  async function loadWeather(manual = false) {
+    const btn = document.getElementById('btn-refresh');
+    btn.classList.add('spinning');
+    btn.disabled = true;
+
+    if (!manual) renderLoading();
+
+    // Check if date is within 16-day forecast window
+    const now = new Date();
+    const daysUntil = Math.ceil((WEDDING_DATE - now) / (1000 * 60 * 60 * 24));
+    if (daysUntil > 16) {
+      renderNotYetAvailable(daysUntil);
+      document.getElementById('last-update').textContent = 'Verwachting nog niet beschikbaar';
+      btn.classList.remove('spinning');
+      btn.disabled = false;
+      return;
+    }
+
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      renderWeather(data);
+      const now2 = new Date();
+      document.getElementById('last-update').textContent =
+        `Laatste update: ${now2.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})}`;
+    } catch (err) {
+      renderError('Kon de weerdata niet ophalen (' + err.message + ').');
+    }
+
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+
+  // Init
+  updateCountdown();
+  setInterval(updateCountdown, 60 * 1000);
+  loadWeather();
+</script>
+</body>
+</html>
