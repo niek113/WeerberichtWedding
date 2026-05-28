@@ -509,6 +509,119 @@
       }
     }
 
+    /* ── Date Picker ── */
+    .date-picker-section {
+      margin-top: 48px;
+      padding-top: 36px;
+      border-top: 1px solid var(--rose-light);
+    }
+    .date-picker-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: var(--text);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .date-picker-section h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--rose-light), transparent);
+    }
+    .date-picker-inner {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid rgba(201,160,160,0.15);
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .date-input-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .date-input-wrap label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      font-weight: 700;
+    }
+    input[type="date"] {
+      font-family: 'Lato', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--cream);
+      border: 1.5px solid var(--rose-light);
+      border-radius: 12px;
+      padding: 10px 16px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    input[type="date"]:focus {
+      border-color: var(--rose);
+    }
+    .quick-dates {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .quick-dates span {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-light);
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .btn-quickdate {
+      background: var(--cream);
+      border: 1.5px solid var(--rose-light);
+      border-radius: 24px;
+      padding: 7px 16px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-quickdate:hover,
+    .btn-quickdate.active {
+      background: var(--rose-light);
+      border-color: var(--rose);
+      color: var(--rose-deep);
+    }
+    .btn-quickdate.wedding {
+      background: linear-gradient(135deg, var(--rose-light), var(--gold-light));
+      border-color: var(--gold);
+    }
+    .btn-quickdate.wedding.active {
+      background: linear-gradient(135deg, #e8c0c0, #e8d8b0);
+      border-color: var(--gold);
+    }
+    .model-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--cream);
+      border: 1px solid var(--rose-light);
+      border-radius: 24px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      color: var(--text-light);
+    }
+    .model-chip strong { color: var(--rose-deep); }
+
     /* ── Footer ── */
     footer {
       text-align: center;
@@ -651,6 +764,23 @@
   <!-- Content area -->
   <div id="content"></div>
 
+  <!-- Date Picker -->
+  <div class="date-picker-section">
+    <h2>📅 Andere dag bekijken</h2>
+    <div class="date-picker-inner">
+      <div class="date-input-wrap">
+        <label for="date-input">Kies een datum</label>
+        <input type="date" id="date-input" onchange="onDateChange(this.value)" />
+      </div>
+      <div class="quick-dates">
+        <span>Snel:</span>
+        <button class="btn-quickdate" id="btn-today" onclick="selectQuickDate('today')">Vandaag</button>
+        <button class="btn-quickdate wedding" id="btn-wedding" onclick="selectQuickDate('wedding')">💍 6 juni (trouwdag)</button>
+      </div>
+      <div id="model-info"></div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer>
     <p>Weerdata via <a href="https://open-meteo.com/" target="_blank">Open-Meteo</a> &mdash; vrij beschikbaar, geen API-sleutel vereist</p>
@@ -660,16 +790,65 @@
 </div>
 
 <script>
-  const WEDDING_DATE = new Date('2026-06-06T00:00:00');
-  const BASE_URL = 'https://api.open-meteo.com/v1/forecast?latitude=52.659&longitude=5.762&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,sunshine_duration,uv_index&daily=sunrise,sunset&timezone=Europe%2FAmsterdam&start_date=2026-06-06&end_date=2026-06-06';
+  const WEDDING_DATE     = new Date('2026-06-06T00:00:00');
+  const WEDDING_DATE_STR = '2026-06-06';
+  let   selectedDate     = WEDDING_DATE_STR;
 
-  function getModel(daysUntil) {
-    if (daysUntil <= 5) return { id: 'icon_eu',       label: 'DWD ICON-EU',  desc: 'Hoge resolutie (7 km) — beste keuze binnen 5 dagen' };
-    return              { id: 'ecmwf_ifs025',          label: 'ECMWF IFS',    desc: 'Meest nauwkeurig op middellange termijn (5–16 dagen)' };
+  function toDateStr(d) {
+    return d.toISOString().slice(0, 10);
   }
-
-  function getApiUrl(daysUntil) {
-    return BASE_URL + '&models=' + getModel(daysUntil).id;
+  function todayStr() {
+    return toDateStr(new Date());
+  }
+  function maxDateStr() {
+    const d = new Date();
+    d.setDate(d.getDate() + 16);
+    return toDateStr(d);
+  }
+  function getDaysUntil(dateStr) {
+    const target = new Date(dateStr + 'T00:00:00');
+    return Math.ceil((target - new Date()) / (1000 * 60 * 60 * 24));
+  }
+  function getModel(daysUntil) {
+    if (daysUntil <= 5) return { id: 'icon_eu',      label: 'DWD ICON-EU', desc: 'Hoge resolutie (7 km) — beste keuze binnen 5 dagen' };
+    return                     { id: 'ecmwf_ifs025',  label: 'ECMWF IFS',  desc: 'Meest nauwkeurig op middellange termijn (5–16 dagen)' };
+  }
+  function getApiUrl(dateStr) {
+    const days  = getDaysUntil(dateStr);
+    const model = getModel(days);
+    return `https://api.open-meteo.com/v1/forecast?latitude=52.659&longitude=5.762`
+      + `&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,sunshine_duration,uv_index`
+      + `&daily=sunrise,sunset&timezone=Europe%2FAmsterdam`
+      + `&start_date=${dateStr}&end_date=${dateStr}&models=${model.id}`;
+  }
+  function formatDateNL(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function updateDatePicker() {
+    const input = document.getElementById('date-input');
+    if (!input) return;
+    input.min   = todayStr();
+    input.max   = maxDateStr();
+    input.value = selectedDate;
+    const days  = getDaysUntil(selectedDate);
+    const model = getModel(days);
+    document.getElementById('model-info').innerHTML =
+      `<div class="model-chip">Model: <strong title="${model.desc}">${model.label}</strong></div>`;
+    // highlight quick buttons
+    document.getElementById('btn-today').classList.toggle('active', selectedDate === todayStr());
+    document.getElementById('btn-wedding').classList.toggle('active', selectedDate === WEDDING_DATE_STR);
+  }
+  function onDateChange(val) {
+    if (!val) return;
+    selectedDate = val;
+    updateDatePicker();
+    loadWeather(false, true);
+  }
+  function selectQuickDate(which) {
+    selectedDate = which === 'wedding' ? WEDDING_DATE_STR : todayStr();
+    updateDatePicker();
+    loadWeather(false, true);
   }
 
   const WMO_EMOJI = {
@@ -765,7 +944,11 @@
       </div>`;
   }
 
-  function renderWeather(data) {
+  function renderWeather(data, dateStr = WEDDING_DATE_STR) {
+    const isWedding = dateStr === WEDDING_DATE_STR;
+    const dateLabel = isWedding
+      ? '🌸 6 juni 2026 — Trouwdag'
+      : '📅 ' + formatDateNL(dateStr);
     const hourly = data.hourly;
     const daily  = data.daily;
 
@@ -798,7 +981,7 @@
 
     const summaryHTML = `
       <div class="day-summary">
-        <h2>🌸 Dagoverzicht</h2>
+        <h2>${dateLabel}</h2>
         <div class="summary-grid">
           <div class="summary-item">
             <span class="s-icon">🌅</span>
@@ -873,18 +1056,19 @@
       </div>`;
   }
 
-  async function loadWeather(manual = false) {
+  async function loadWeather(manual = false, scrollToTop = false) {
     const btn = document.getElementById('btn-refresh');
     btn.classList.add('spinning');
     btn.disabled = true;
 
     if (!manual) renderLoading();
+    if (scrollToTop) window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Check if date is within 16-day forecast window
-    const now = new Date();
-    const daysUntil = Math.ceil((WEDDING_DATE - now) / (1000 * 60 * 60 * 24));
-    if (daysUntil > 16) {
-      renderNotYetAvailable(daysUntil);
+    const days  = getDaysUntil(selectedDate);
+    const model = getModel(days);
+
+    if (days > 16) {
+      renderNotYetAvailable(days);
       document.getElementById('last-update').textContent = 'Verwachting nog niet beschikbaar';
       btn.classList.remove('spinning');
       btn.disabled = false;
@@ -892,11 +1076,10 @@
     }
 
     try {
-      const model = getModel(daysUntil);
-      const res = await fetch(getApiUrl(daysUntil));
+      const res = await fetch(getApiUrl(selectedDate));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      renderWeather(data);
+      renderWeather(data, selectedDate);
       const now2 = new Date();
       document.getElementById('last-update').innerHTML =
         `Laatste update: ${now2.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})} &nbsp;·&nbsp; `
@@ -912,6 +1095,7 @@
   // Init
   updateCountdown();
   setInterval(updateCountdown, 60 * 1000);
+  updateDatePicker();
   loadWeather();
 </script>
 </body>
