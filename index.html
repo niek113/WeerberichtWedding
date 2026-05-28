@@ -661,7 +661,16 @@
 
 <script>
   const WEDDING_DATE = new Date('2026-06-06T00:00:00');
-  const API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=52.659&longitude=5.762&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,sunshine_duration,uv_index&daily=sunrise,sunset&timezone=Europe%2FAmsterdam&start_date=2026-06-06&end_date=2026-06-06';
+  const BASE_URL = 'https://api.open-meteo.com/v1/forecast?latitude=52.659&longitude=5.762&hourly=temperature_2m,apparent_temperature,precipitation_probability,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,sunshine_duration,uv_index&daily=sunrise,sunset&timezone=Europe%2FAmsterdam&start_date=2026-06-06&end_date=2026-06-06';
+
+  function getModel(daysUntil) {
+    if (daysUntil <= 5) return { id: 'icon_eu',       label: 'DWD ICON-EU',  desc: 'Hoge resolutie (7 km) — beste keuze binnen 5 dagen' };
+    return              { id: 'ecmwf_ifs025',          label: 'ECMWF IFS',    desc: 'Meest nauwkeurig op middellange termijn (5–16 dagen)' };
+  }
+
+  function getApiUrl(daysUntil) {
+    return BASE_URL + '&models=' + getModel(daysUntil).id;
+  }
 
   const WMO_EMOJI = {
     0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
@@ -883,13 +892,15 @@
     }
 
     try {
-      const res = await fetch(API_URL);
+      const model = getModel(daysUntil);
+      const res = await fetch(getApiUrl(daysUntil));
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       renderWeather(data);
       const now2 = new Date();
-      document.getElementById('last-update').textContent =
-        `Laatste update: ${now2.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})}`;
+      document.getElementById('last-update').innerHTML =
+        `Laatste update: ${now2.toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'})} &nbsp;·&nbsp; `
+        + `<span title="${model.desc}" style="font-weight:700;color:var(--rose-deep);">${model.label}</span>`;
     } catch (err) {
       renderError('Kon de weerdata niet ophalen (' + err.message + ').');
     }
